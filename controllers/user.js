@@ -27,3 +27,43 @@ export const register = async (req, res) => {
     email: user.email,
   });
 };
+
+// login Function
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  const userExist = await User.findOne({ email });
+
+  if (!userExist) return res.status(400).json({ message: "email doesn't exist" });
+
+  if (email && password) {
+    // check user password with hashed password stored in the database
+    const validPassword = await bcrypt.compare(password, userExist.password);
+
+    if (validPassword) {
+      const token = generateToken(userExist._id);
+      //   return res.status(200).json({ token });
+      return res.status(200).json({ id: userExist._id, name: userExist.name, email: userExist.email, token });
+    } else {
+      res.status(400).json({ message: 'These credentials do not match our records' });
+    }
+  }
+};
+
+// get authenticated user
+export const getMe = (req, res) => {
+  res.status(200).json(req.user);
+};
+
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign(
+    {
+      id,
+    },
+    // process.env.JWT_SECRET,
+    'mysecret',
+    // { expiresIn: '1h' }  //hour format
+    { expiresIn: '30d' }
+  );
+};
