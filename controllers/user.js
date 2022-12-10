@@ -50,9 +50,18 @@ export const login = async (req, res) => {
   }
 };
 
+// forgot password Function
+export const forgotPassword = async (req, res) => {};
+
 // get authenticated user
 export const getMe = (req, res) => {
   res.status(200).json(req.user);
+};
+
+// get all users
+export const getallUsers = async (req, res) => {
+  const users = await User.find({});
+  res.status(200).json(users);
 };
 
 // Generate JWT
